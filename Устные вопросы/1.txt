@@ -1,0 +1,23 @@
+Какой самый эффективный способ конкатенации строк?
+
+Самый удобный способ это fmt.Sprintf
+
+
+Если нужна скорость strings.Builder
+
+ func join(strs ...string) string {
+    var sb strings.Builder
+    for _, str := range strs {
+            sb.WriteString(str)
+    }
+    return sb.String()
+ }
+
+Таким же образом мы можем использовать методы WriteRune и WriteByte для добавления символов к строке:
+
+ func joinRunes(runes ...rune) string {
+    var sb strings.Builder
+    for _,  := rrange runes {
+            sb.WriteRune()
+    }
+    rreturn sb.String()

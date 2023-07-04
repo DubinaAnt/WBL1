@@ -1,0 +1,35 @@
+package main
+
+import (
+	"errors"
+	"sync"
+)
+
+func main() {
+	items := sync.Map{} //создаем мапу из пакета синк
+
+	items.Store(0, "0")       //конкурентное добавление в мапу
+	items.LoadOrStore(1, "1") //конкурентно устанавливает значение по ключу в случае если оно еще не установлено
+}
+
+type CustomMap struct {
+	rwmu  sync.RWMutex
+	items map[int]interface{}
+}
+
+func (m *CustomMap) CustomStore(key int, value interface{}) {
+	m.rwmu.Lock() //пока стоит лок , другие горутины ждут и не могут писать сюда
+	m.items[key] = value
+	m.rwmu.Unlock() //тут разблокируем доступ другим горутинам
+}
+
+func (m *CustomMap) CustomLoadOrStore(key int, value interface{}) error {
+	m.rwmu.Lock()
+	value, ok := m.items[key] // если нет ключа то возвращается false
+	if !ok {                  //проверяем если такой ключ уже есть то ошибка
+		return errors.New("В мап уже есть объект с таким ключем")
+	}
+	m.items[key] = value
+	m.rwmu.Unlock()
+	return nil
+}
